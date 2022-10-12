@@ -45,5 +45,19 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+
+	<!-- Geolocation -->
+	<key>NSLocationAlwaysUsageDescription</key>
+		<string>Necesito tu autorización para saber tu ubicación</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Necesito tu autorización para saber tu ubicación</string>
+
+	<!-- Camera -->
+	<key>NSCameraUsageDescription</key>
+		<string>Necesito tu autorización para usar la camara</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Necesito tu autorización para guardar en tu galería</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+		<string>Necesito tu autorización para usar tu galería</string>
 </dict>
 </plist>

@@ -3,6 +3,17 @@ import { Router } from '@angular/router';
 import { PostsService } from '../../services/posts.service';
 
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
+// import { Camera, CameraOptions } from '@awesome-cordova-plugins/camera/ngx';
+
+import {
+  Camera,
+  CameraResultType,
+  CameraSource,
+  ImageOptions,
+} from '@capacitor/camera';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
+declare let window: any;
 
 @Component({
   selector: 'app-tab2',
@@ -10,7 +21,7 @@ import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
   styleUrls: ['tab2.page.scss'],
 })
 export class Tab2Page {
-  tempImages: string[] = [];
+  tempImages: SafeResourceUrl[] = [];
   cargandoGeo = false;
 
   post = {
@@ -22,7 +33,8 @@ export class Tab2Page {
   constructor(
     private postService: PostsService,
     private route: Router,
-    private geolocation: Geolocation
+    private geolocation: Geolocation,
+    private domSanitizer: DomSanitizer
   ) {}
 
   async crearPost() {
@@ -61,5 +73,44 @@ export class Tab2Page {
         console.log('Error getting location', error);
         this.cargandoGeo = false;
       });
+  }
+
+  camara() {
+    const options: ImageOptions = {
+      quality: 60,
+      allowEditing: false,
+      correctOrientation: true,
+      resultType: CameraResultType.Uri,
+      source: CameraSource.Camera,
+    };
+
+    this.procesarImagen(options);
+  }
+
+  libreria() {
+    const options: ImageOptions = {
+      quality: 60,
+      allowEditing: false,
+      correctOrientation: true,
+      resultType: CameraResultType.Uri,
+      source: CameraSource.Photos,
+    };
+
+    this.procesarImagen(options);
+  }
+
+  procesarImagen(options: ImageOptions) {
+    Camera.getPhoto(options).then(
+      (imageData) => {
+        const img = this.domSanitizer.bypassSecurityTrustResourceUrl(
+          imageData && imageData.webPath
+        );
+
+        this.tempImages.push(img);
+      },
+      (err) => {
+        // Handle error
+      }
+    );
   }
 }
