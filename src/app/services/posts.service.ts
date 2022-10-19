@@ -44,4 +44,19 @@ export class PostsService {
       });
     });
   }
+
+  async subirImagen(imgData) {
+    const headers = new HttpHeaders({
+      'x-token': this.usuarioService.token,
+    });
+
+    return new Promise((resolve) => {
+      this.http
+        .post(`${URL}/posts/upload`, imgData, { headers })
+        .subscribe((resp) => {
+          console.log(resp);
+          resolve(true);
+        });
+    });
+  }
 }

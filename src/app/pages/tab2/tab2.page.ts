@@ -2,18 +2,22 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { PostsService } from '../../services/posts.service';
 
-import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
+// import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 // import { Camera, CameraOptions } from '@awesome-cordova-plugins/camera/ngx';
+
+import { Geolocation } from '@capacitor/geolocation';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { finalize } from 'rxjs/operators';
 
 import {
   Camera,
   CameraResultType,
   CameraSource,
   ImageOptions,
+  Photo,
 } from '@capacitor/camera';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-
-declare let window: any;
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab2',
@@ -33,8 +37,8 @@ export class Tab2Page {
   constructor(
     private postService: PostsService,
     private route: Router,
-    private geolocation: Geolocation,
-    private domSanitizer: DomSanitizer
+    private domSanitizer: DomSanitizer,
+    private plt: Platform
   ) {}
 
   async crearPost() {
@@ -47,6 +51,8 @@ export class Tab2Page {
       position: false,
     };
 
+    this.tempImages = [];
+
     this.route.navigateByUrl('/main/tabs/tab1');
   }
 
@@ -58,8 +64,7 @@ export class Tab2Page {
 
     this.cargandoGeo = true;
 
-    this.geolocation
-      .getCurrentPosition()
+    Geolocation.getCurrentPosition()
       .then((resp) => {
         // resp.coords.latitude
         // resp.coords.longitude
@@ -80,7 +85,7 @@ export class Tab2Page {
       quality: 60,
       allowEditing: false,
       correctOrientation: true,
-      resultType: CameraResultType.Uri,
+      resultType: CameraResultType.DataUrl,
       source: CameraSource.Camera,
     };
 
@@ -92,7 +97,7 @@ export class Tab2Page {
       quality: 60,
       allowEditing: false,
       correctOrientation: true,
-      resultType: CameraResultType.Uri,
+      resultType: CameraResultType.DataUrl,
       source: CameraSource.Photos,
     };
 
@@ -101,16 +106,51 @@ export class Tab2Page {
 
   procesarImagen(options: ImageOptions) {
     Camera.getPhoto(options).then(
-      (imageData) => {
+      async (imageData) => {
+        console.log(imageData);
         const img = this.domSanitizer.bypassSecurityTrustResourceUrl(
           imageData && imageData.webPath
         );
 
-        this.tempImages.push(img);
+        // const fileData = await this.readAsBase64(imageData);
+        // console.log(fileData);
+        // this.startUpload(imageData.webPath);
+
+        this.tempImages.push(imageData.dataUrl);
       },
       (err) => {
         // Handle error
       }
     );
+  }
+
+  // Convert the base64 to blob data
+  // and create  formData with it
+  async startUpload(data) {
+    // const response = await fetch(data);
+    // console.log(response);
+    // const blob = await response.blob();
+    const formData = new FormData();
+    formData.append('image', data);
+    this.postService.subirImagen(formData);
+  }
+
+  // Helper function
+  convertBlobToBase64 = (blob: Blob) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.readAsDataURL(blob);
+    });
+
+  private async readAsBase64(photo: Photo) {
+    const file = await Filesystem.readFile({
+      path: photo.path,
+    });
+
+    return file.data;
   }
 }
