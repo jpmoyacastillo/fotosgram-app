@@ -5,6 +5,6 @@ import { ImagenPipe } from './imagen.pipe';
 
 @NgModule({
   declarations: [DomSanitizerPipe, ImgSanitizerPipe, ImagenPipe],
-  exports: [DomSanitizerPipe, ImgSanitizerPipe],
+  exports: [DomSanitizerPipe, ImgSanitizerPipe, ImagenPipe],
 })
 export class PipesModule {}

@@ -12,11 +12,20 @@
 
   <!-- ngIf si existen img -->
   <ion-slides pager="true" *ngIf="post.imgs.length > 1">
-    <ion-slide class="image-slide" [style]="img1 | domSanitizer"> </ion-slide>
+    <ion-slide
+      *ngFor="let img of post.imgs"
+      class="image-slide"
+      [style]="img | imagen: post.usuario._id | domSanitizer"
+    >
+    </ion-slide>
   </ion-slides>
 
-  <ion-slides *ngIf="post.imgs.length === 1">
-    <ion-slide class="image-slide" [style]="img1 | domSanitizer"> </ion-slide>
+  <ion-slides *ngIf="post.imgs.length === 1" [options]="slideSoloOpts">
+    <ion-slide
+      class="image-slide"
+      [style]="post.imgs[0] | imagen: post.usuario._id | domSanitizer"
+    >
+    </ion-slide>
   </ion-slides>
 
   <!-- Mapa si hay coordenadas-->

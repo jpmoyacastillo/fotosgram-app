@@ -112,9 +112,11 @@ export class Tab2Page {
           imageData && imageData.webPath
         );
 
-        // const fileData = await this.readAsBase64(imageData);
-        // console.log(fileData);
-        // this.startUpload(imageData.webPath);
+        //const fileData = await this.readAsBase64(imageData);
+        const fileName = new Date().getTime() + '.' + imageData.format;
+        const file = await this.urltoFile(imageData.dataUrl, fileName);
+
+        this.startUpload(file);
 
         this.tempImages.push(imageData.dataUrl);
       },
@@ -124,33 +126,18 @@ export class Tab2Page {
     );
   }
 
-  // Convert the base64 to blob data
-  // and create  formData with it
-  async startUpload(data) {
-    // const response = await fetch(data);
-    // console.log(response);
-    // const blob = await response.blob();
-    const formData = new FormData();
-    formData.append('image', data);
-    this.postService.subirImagen(formData);
+  urltoFile(url, filename, mimeType?) {
+    mimeType = mimeType || (url.match(/^data:([^;]+);/) || '')[1];
+    return fetch(url)
+      .then((res) => res.arrayBuffer())
+      .then((buf) => new File([buf], filename, { type: mimeType }));
   }
 
-  // Helper function
-  convertBlobToBase64 = (blob: Blob) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = reject;
-      reader.onload = () => {
-        resolve(reader.result);
-      };
-      reader.readAsDataURL(blob);
-    });
-
-  private async readAsBase64(photo: Photo) {
-    const file = await Filesystem.readFile({
-      path: photo.path,
-    });
-
-    return file.data;
+  // Convert the base64 to blob data
+  // and create  formData with it
+  async startUpload(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    this.postService.subirImagen(formData);
   }
 }

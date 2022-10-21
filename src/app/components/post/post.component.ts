@@ -9,9 +9,14 @@ import { Post } from '../../interfaces/interfaces';
 export class PostComponent implements OnInit {
   @Input() post: Post = {};
 
-  img1 = '/assets/space-1.jpg';
-  img2 = '/assets/space-2.jpg';
-  img3 = '/assets/space-3.jpg';
+  slideSoloOpts = {
+    allowSlideNext: false,
+    allowSlidePrev: false,
+  };
+
+  // img1 = '/assets/space-1.jpg';
+  // img2 = '/assets/space-2.jpg';
+  // img3 = '/assets/space-3.jpg';
 
   constructor() {}
 
